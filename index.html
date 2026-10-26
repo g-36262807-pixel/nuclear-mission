@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuclear Mission — Sains Tingkatan 4</title>
+<style>
+:root{--bg:#07111f;--panel:#101f33;--gold:#ffd166;--cyan:#63e6e2;--white:#f4f7fb;--muted:#a9b8cc;--green:#7ee787;--red:#ff8c8c}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top,#17304d,var(--bg) 58%);color:var(--white);min-height:100vh}
+main{max-width:900px;margin:auto;padding:24px 16px 40px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;color:var(--cyan);font-size:.9rem;letter-spacing:.08em;text-transform:uppercase}
+.hero{padding:30px 0 20px}.eyebrow{color:var(--gold);font-weight:bold;letter-spacing:.12em;font-size:.8rem}.hero h1{font-size:clamp(2.2rem,7vw,4.3rem);line-height:.98;margin:12px 0}.hero p{color:var(--muted);font-size:1.08rem;line-height:1.6;max-width:680px}
+.panel{background:linear-gradient(145deg,rgba(20,39,62,.97),rgba(11,24,41,.97));border:1px solid #284563;border-radius:22px;padding:clamp(20px,4vw,34px);box-shadow:0 20px 55px #0005}
+.tag{display:inline-block;border:1px solid #35536f;border-radius:999px;padding:7px 11px;color:var(--cyan);font-size:.82rem;margin:0 6px 8px 0}
+h2{font-size:clamp(1.4rem,4vw,2rem);margin:12px 0}p{line-height:1.6}.muted{color:var(--muted)}
+.btn{cursor:pointer;border:0;border-radius:12px;padding:13px 18px;font-weight:bold;font-size:1rem;background:var(--gold);color:#172235;margin-top:12px}.btn.secondary{background:#203a56;color:var(--white);border:1px solid #3a5a79}.btn:focus,.choice:focus{outline:3px solid var(--cyan);outline-offset:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0}
+.choice{cursor:pointer;text-align:left;background:#122941;color:var(--white);border:1px solid #35536f;border-radius:14px;padding:16px;min-height:70px;font-size:1rem;line-height:1.4}.choice:hover{border-color:var(--cyan);background:#183550}.choice.selected{border:2px solid var(--gold);background:#29354a}
+.progress{height:7px;background:#263d55;border-radius:99px;overflow:hidden;margin:18px 0}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--gold));transition:width .3s}
+.feedback{border-radius:12px;padding:14px;margin-top:16px;line-height:1.55}.good{background:#12392f;border:1px solid #2b775d}.try{background:#42262b;border:1px solid #8e4b54}
+.hidden{display:none}.foot{color:var(--muted);font-size:.85rem;margin-top:18px}.mission-num{color:var(--gold);font-weight:bold}.symbol{font-size:3.2rem;margin-bottom:6px}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><span>SMK TINUSA · PdPR SAINS TINGKATAN 4</span><span>MODUL INTERAKTIF</span></div>
+  <section id="intro" class="hero">
+    <div class="eyebrow">MISI SAINS · BAB NUKLEAR</div>
+    <h1>NUCLEAR<br><span style="color:var(--gold)">MISSION</span></h1>
+    <p>Bandar memerlukan sumber tenaga elektrik. Anda ialah pegawai sains yang perlu menilai teknologi nuklear dan membuat keputusan yang bertanggungjawab.</p>
+    <span class="tag">3 misi klik</span><span class="tag">10–15 minit</span><span class="tag">Maklum balas segera</span>
+    <button class="btn" onclick="start()">MULA MISI →</button>
+  </section>
+  <section id="game" class="panel hidden" aria-live="polite">
+    <div class="top"><span id="missionLabel" class="mission-num">MISI 1 / 3</span><span id="scoreLabel">Skor: 0</span></div>
+    <div class="progress"><div id="bar" class="bar"></div></div>
+    <div id="icon" class="symbol">⚡</div>
+    <h2 id="questionTitle"></h2>
+    <p id="questionText" class="muted"></p>
+    <div id="choices" class="grid"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <button id="next" class="btn hidden" onclick="nextMission()">MISI SETERUSNYA →</button>
+  </section>
+  <section id="finish" class="panel hidden">
+    <div class="symbol">🏁</div><div class="eyebrow">MISI SELESAI</div><h2>Bandar anda kini lebih bersedia!</h2>
+    <p id="resultText"></p>
+    <h3>Refleksi ringkas</h3>
+    <p>Taip jawapan anda di ruang bawah. Kemudian salin jawapan atau ambil tangkap layar untuk dihantar kepada guru.</p>
+    <label for="reflection" class="muted">Pada pendapat anda, apakah satu perkara paling penting untuk memastikan teknologi nuklear digunakan dengan selamat?</label>
+    <textarea id="reflection" rows="4" style="display:block;width:100%;margin-top:10px;padding:12px;border-radius:12px;border:1px solid #35536f;background:#091727;color:white;font:inherit"></textarea>
+    <button class="btn" onclick="copyResult()">SALIN LAPORAN</button>
+    <button class="btn secondary" onclick="restart()">CUBA SEMULA</button>
+    <p id="copyStatus" class="muted"></p>
+  </section>
+  <p class="foot">Arahan murid: Klik satu jawapan bagi setiap misi. Baca maklum balas, lengkapkan refleksi dan hantar laporan kepada guru melalui platform kelas.</p>
+</main>
+<script>
+const missions=[
+ {icon:"⚡",title:"Misi 1 — Bekalan tenaga",text:"Bandar ingin menjana tenaga elektrik menggunakan teknologi nuklear. Di manakah proses ini berlaku?",options:["Loji kuasa nuklear","Panel solar","Turbin angin"],correct:0,why:"Loji kuasa nuklear menggunakan tenaga daripada pembelahan nuklear untuk menghasilkan haba, menghasilkan wap dan memutarkan turbin penjana elektrik."},
+ {icon:"☢️",title:"Misi 2 — Risiko yang perlu diurus",text:"Apakah satu isu utama yang perlu diberi perhatian apabila menggunakan tenaga nuklear?",options:["Penghasilan sisa radioaktif","Penghasilan cahaya matahari","Kekurangan angin"],correct:0,why:"Sisa radioaktif perlu dikendalikan dan disimpan dengan selamat bagi mengurangkan risiko pendedahan radiasi kepada manusia dan alam sekitar."},
+ {icon:"🛡️",title:"Misi 3 — Keputusan pegawai sains",text:"Apakah tindakan paling bertanggungjawab untuk mengurangkan risiko penggunaan teknologi nuklear?",options:["Mengabaikan prosedur keselamatan","Mengurus sisa mengikut prosedur keselamatan","Membuang sisa ke dalam sungai"],correct:1,why:"Pematuhan prosedur keselamatan serta pengurusan sisa yang betul membantu melindungi manusia dan alam sekitar."}
+];
+let current=0,score=0,answers=[];
+function start(){document.getElementById('intro').classList.add('hidden');document.getElementById('game').classList.remove('hidden');render()}
+function render(){const m=missions[current];document.getElementById('missionLabel').textContent=`MISI ${current+1} / ${missions.length}`;document.getElementById('scoreLabel').textContent=`Skor: ${score}`;document.getElementById('bar').style.width=`${current/missions.length*100}%`;document.getElementById('icon').textContent=m.icon;document.getElementById('questionTitle').textContent=m.title;document.getElementById('questionText').textContent=m.text;document.getElementById('feedback').className='feedback hidden';document.getElementById('next').classList.add('hidden');const box=document.getElementById('choices');box.innerHTML='';m.options.forEach((o,i)=>{const b=document.createElement('button');b.className='choice';b.textContent=String.fromCharCode(65+i)+'. '+o;b.onclick=()=>choose(i);box.appendChild(b)})}
+function choose(i){if(answers[current]!==undefined)return;answers[current]=i;const m=missions[current];const correct=i===m.correct;if(correct)score++;document.querySelectorAll('.choice').forEach((b,j)=>{b.disabled=true;if(j===i)b.classList.add('selected')});const f=document.getElementById('feedback');f.className='feedback '+(correct?'good':'try');f.innerHTML=`<strong>${correct?'Jawapan tepat!':'Cuba semak semula.'}</strong><br>${m.why}`;document.getElementById('scoreLabel').textContent=`Skor: ${score}`;document.getElementById('bar').style.width=`${(current+1)/missions.length*100}%`;document.getElementById('next').textContent=current===missions.length-1?'LIHAT KEPUTUSAN →':'MISI SETERUSNYA →';document.getElementById('next').classList.remove('hidden')}
+function nextMission(){if(current<missions.length-1){current++;render()}else{document.getElementById('game').classList.add('hidden');document.getElementById('finish').classList.remove('hidden');document.getElementById('resultText').textContent=`Skor anda: ${score}/${missions.length}. ${score===3?'Cemerlang! Anda berjaya menyelesaikan semua misi.':'Teruskan usaha dan semak semula maklum balas bagi setiap misi.'}`}}
+function report(){return `NUCLEAR MISSION — SAINS TINGKATAN 4\nSkor: ${score}/${missions.length}\n`+missions.map((m,i)=>`Misi ${i+1}: ${m.options[answers[i]]||'Belum dijawab'}`).join('\n')+`\nRefleksi: ${document.getElementById('reflection').value}`}
+async function copyResult(){const t=report();try{await navigator.clipboard.writeText(t);document.getElementById('copyStatus').textContent='Laporan disalin. Tampal dalam WhatsApp atau Google Classroom.'}catch(e){document.getElementById('copyStatus').textContent=t}}
+function restart(){current=0;score=0;answers=[];document.getElementById('finish').classList.add('hidden');document.getElementById('game').classList.remove('hidden');render()}
+</script>
+</body>
+</html>
